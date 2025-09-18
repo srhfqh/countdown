@@ -103,8 +103,9 @@
   </div>
 
   <script>
-  // Target time: 19 Sept 2025 00:00 MYT (UTC+8 = 16:00 UTC on 18 Sept)
-  const target = new Date(Date.UTC(2025, 8, 18, 16, 0, 0));
+  // Target time: 19 Sept 2025, 00:00 local time (MYT if your device is set to KL time)
+  const target = new Date(2025, 8, 19, 0, 0, 0); 
+  // (Months are 0-based → 8 = September)
 
   const daysEl = document.getElementById('days');
   const hoursEl = document.getElementById('hours');
@@ -113,11 +114,11 @@
   const zeroMsg = document.getElementById('zeroMsg');
   const countdownWrap = document.getElementById('countdown');
 
-  function pad(n){return String(n).padStart(2,'0');}
+  function pad(n){ return String(n).padStart(2, '0'); }
 
   function update(){
     const now = new Date();
-    let diff = target - now;
+    let diff = target.getTime() - now.getTime();
 
     if (diff <= 0){
       countdownWrap.style.display = 'none';
@@ -126,22 +127,22 @@
       return;
     }
 
-    const s = Math.floor(diff/1000) % 60;
-    const m = Math.floor(diff/1000/60) % 60;
-    const h = Math.floor(diff/1000/3600) % 24;
-    const d = Math.floor(diff/1000/3600/24);
+    const s = Math.floor(diff / 1000) % 60;
+    const m = Math.floor(diff / 1000 / 60) % 60;
+    const h = Math.floor(diff / 1000 / 3600) % 24;
+    const d = Math.floor(diff / 1000 / 3600 / 24);
 
     daysEl.textContent = d;
     hoursEl.textContent = pad(h);
     minutesEl.textContent = pad(m);
     secondsEl.textContent = pad(s);
 
-    if (diff < 1000*60*60) document.body.classList.add('urgent');
+    if (diff < 1000 * 60 * 60) document.body.classList.add('urgent');
     else document.body.classList.remove('urgent');
   }
 
   update();
-  const timer = setInterval(update, 250);
+  const timer = setInterval(update, 1000); // update every 1s
 
   const observer = new MutationObserver(()=>{
     if (zeroMsg.style.display === 'block'){
@@ -151,6 +152,7 @@
   });
   observer.observe(zeroMsg, {attributes:true,childList:true, subtree:true});
 </script>
+
 
 </body>
 </html>
