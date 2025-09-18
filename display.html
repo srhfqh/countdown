@@ -103,57 +103,54 @@
   </div>
 
   <script>
-    // Target time: 2025-09-19 00:00 in Asia/Kuala_Lumpur (UTC+8)
-    const target = new Date('2025-09-19T00:00:00+08:00');
+  // Target time: 19 Sept 2025 00:00 MYT (UTC+8 = 16:00 UTC on 18 Sept)
+  const target = new Date(Date.UTC(2025, 8, 18, 16, 0, 0));
 
-    const daysEl = document.getElementById('days');
-    const hoursEl = document.getElementById('hours');
-    const minutesEl = document.getElementById('minutes');
-    const secondsEl = document.getElementById('seconds');
-    const zeroMsg = document.getElementById('zeroMsg');
-    const countdownWrap = document.getElementById('countdown');
+  const daysEl = document.getElementById('days');
+  const hoursEl = document.getElementById('hours');
+  const minutesEl = document.getElementById('minutes');
+  const secondsEl = document.getElementById('seconds');
+  const zeroMsg = document.getElementById('zeroMsg');
+  const countdownWrap = document.getElementById('countdown');
 
-    function pad(n){return String(n).padStart(2,'0');}
+  function pad(n){return String(n).padStart(2,'0');}
 
-    function update(){
-      const now = new Date();
-      let diff = target - now;
+  function update(){
+    const now = new Date();
+    let diff = target - now;
 
-      if (diff <= 0){
-        // show zero message
-        countdownWrap.style.display = 'none';
-        zeroMsg.style.display = 'block';
-        document.body.classList.remove('urgent');
-        return;
-      }
-
-      const s = Math.floor(diff/1000) % 60;
-      const m = Math.floor(diff/1000/60) % 60;
-      const h = Math.floor(diff/1000/3600) % 24;
-      const d = Math.floor(diff/1000/3600/24);
-
-      daysEl.textContent = d;
-      hoursEl.textContent = pad(h);
-      minutesEl.textContent = pad(m);
-      secondsEl.textContent = pad(s);
-
-      // add urgency when under 1 hour
-      if (diff < 1000*60*60) document.body.classList.add('urgent');
-      else document.body.classList.remove('urgent');
+    if (diff <= 0){
+      countdownWrap.style.display = 'none';
+      zeroMsg.style.display = 'block';
+      document.body.classList.remove('urgent');
+      return;
     }
 
-    // initial update and interval
-    update();
-    const timer = setInterval(update, 250);
+    const s = Math.floor(diff/1000) % 60;
+    const m = Math.floor(diff/1000/60) % 60;
+    const h = Math.floor(diff/1000/3600) % 24;
+    const d = Math.floor(diff/1000/3600/24);
 
-    // Accessibility: announce when reaches zero
-    const observer = new MutationObserver(()=>{
-      if (zeroMsg.style.display === 'block'){
-        zeroMsg.setAttribute('aria-live','assertive');
-        clearInterval(timer);
-      }
-    });
-    observer.observe(zeroMsg, {attributes:true,childList:true, subtree:true});
-  </script>
+    daysEl.textContent = d;
+    hoursEl.textContent = pad(h);
+    minutesEl.textContent = pad(m);
+    secondsEl.textContent = pad(s);
+
+    if (diff < 1000*60*60) document.body.classList.add('urgent');
+    else document.body.classList.remove('urgent');
+  }
+
+  update();
+  const timer = setInterval(update, 250);
+
+  const observer = new MutationObserver(()=>{
+    if (zeroMsg.style.display === 'block'){
+      zeroMsg.setAttribute('aria-live','assertive');
+      clearInterval(timer);
+    }
+  });
+  observer.observe(zeroMsg, {attributes:true,childList:true, subtree:true});
+</script>
+
 </body>
 </html>
